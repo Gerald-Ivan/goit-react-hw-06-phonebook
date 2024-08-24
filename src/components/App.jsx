@@ -1,58 +1,40 @@
-import { useState } from "react"
 import { ContactForm } from "./ContactForm/ContactForm"
 import { ContactList } from "./ContactList/ContactList";
 import { Filter } from "./Filter/Filter";
 
+import { useSelector,useDispatch } from "react-redux";
+import { getContacts,getFilter } from "../redux/selectors";
+import { addContact,deleteContact } from "../redux/contactsSlice";
+import { setFilter } from "../redux/filterSlice";
+
 export const App = () => {
-  // state = {
-  //   contacts: [],
-  //   filter: ''
-  // } 
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
 
-  const addContact = newContact => {
-    setContacts((prevContacts) => [...prevContacts, newContact]
+  const handleaddContact = newContact => {
+    dispatch(addContact(newContact));
+  };
+
+  const handleDeleteContact = id => {
+    dispatch(deleteContact(id));
+  };
+
+  const handleFilterChange = filterValue => {
+    dispatch(setFilter(filterValue));
+  };
+
+  const filterContact = () =>
+    contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
     );
-    // this.setState(prevState => ({
-    //   contacts: [...prevState.contacts, newContact]
-    // }));
-  };
 
-  const deleteContact = id => {
-    setContacts((prevContacts) =>  prevContacts.filter(contact => contact.id !== id)
-    )
-    // this.setState(prevState => ({
-    //   contacts: prevState.contacts.filter(contact => contact.id !== id),
-    // }));
-  };
-  //setFilter function changed to changeFilter
-  const changeFilter = filterValue => {
-    setFilter(filterValue)
-    // this.setState({
-    //   filter: filterValue,
-    // });
-  };
-
-  const filterContact = () => {
-    const filterLowerCase = filter.toLowerCase();
-    return contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filterLowerCase)
-    
-    // const { contacts, filter } = this.state;
-    // const filterLowerCase = filter.toLowerCase();
-    // return contacts.filter(contact =>
-    // contact.name.toLowerCase().includes(filterLowerCase)
-    );
-  };
-
-    // const {contacts, filter} = this.state;
     return (
       <>
-      <ContactForm addContact={addContact} contacts={contacts}/>
-      <Filter filter={filter} changeFilter={changeFilter}/>
+      <ContactForm addContact={handleaddContact} contacts={contacts}/>
+      <Filter filter={filter} changeFilter={handleFilterChange}/>
       <ContactList filterContact={filterContact}
-          deleteContact={deleteContact}/>
+          deleteContact={handleDeleteContact}/>
       
       </>
     )
